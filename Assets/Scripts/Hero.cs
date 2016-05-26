@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Hero : MonoBehaviour {
 
@@ -18,10 +19,12 @@ public class Hero : MonoBehaviour {
     void Awake()
     {
         instance = this;
+        
     }
 
     void Start () {
         body = GetComponent<Rigidbody2D>();
+        transform.position = new Vector3(PlayerPrefs.GetFloat("PosX", transform.position.x), PlayerPrefs.GetFloat("PosY", transform.position.y), transform.position.z);
 	}
 
     // Update is called once per frame
@@ -58,5 +61,31 @@ public class Hero : MonoBehaviour {
             transform.localScale = new Vector3(1f, 1f, 1f);
         }
         body.velocity = new Vector2(forceX, body.velocity.y);
+
+        if (Input.GetKeyDown(KeyCode.V))
+        {
+            PlayerPrefs.DeleteAll();
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D col)
+    {
+        if(col.gameObject.tag == "check")
+        {
+            SavePos(col.gameObject.transform.position.x, col.gameObject.transform.position.y);
+            
+        }
+    }
+    void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.gameObject.tag == "dead")
+        {
+            SceneManager.LoadScene("main");
+        }
+    }
+    void SavePos(float x, float y)
+    {
+        PlayerPrefs.SetFloat("PosX", x);
+        PlayerPrefs.SetFloat("PosY", y);
     }
 }
